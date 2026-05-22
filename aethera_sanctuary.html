@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aethera Cinematic Hero & Sanctuary</title>
+    <!-- Tailwind CSS Engine -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons Library -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Inter and Instrument Serif -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        .font-serif {
+            font-family: 'Instrument Serif', serif;
+        }
+        .font-sans {
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes fade-rise {
+            0% {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-rise {
+            animation: fade-rise 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .animate-fade-rise-delay {
+            opacity: 0;
+            animation: fade-rise 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+        }
+
+        .animate-fade-rise-delay-2 {
+            opacity: 0;
+            animation: fade-rise 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 9px;
+        }
+
+        .breathing-orb {
+            transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Prevent system tap highlight on mobile devices */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen w-full overflow-x-hidden bg-[#FFFFFF] font-sans text-[#000000] flex flex-col justify-between">
+
+    <nav class="relative z-50 w-full max-w-7xl mx-auto px-8 py-6 flex justify-between items-center bg-transparent">
+        <div onclick="switchView('landing')" class="cursor-pointer text-3xl font-normal font-serif tracking-tight text-[#000000] select-none">
+            Aethera<sup class="text-sm font-sans tracking-normal relative -top-3 left-0.5">®</sup>
+        </div>
+        
+        <div class="hidden md:flex space-x-12 items-center">
+            <button onclick="switchView('landing')" id="nav-home" class="text-sm font-medium text-[#000000] transition-colors duration-200">
+                Home
+            </button>
+            <button onclick="switchView('sanctuary')" id="nav-studio" class="text-sm font-medium text-[#6F6F6F] hover:text-[#000000] transition-colors duration-200">
+                Studio Focus
+            </button>
+            <span class="text-xs text-neutral-300">|</span>
+            <a href="#about" onclick="switchView('landing')" class="text-sm font-medium text-[#6F6F6F] hover:text-[#000000] transition-colors duration-200">
+                About
+            </a>
+            <a href="#about" onclick="switchView('landing')" class="text-sm font-medium text-[#6F6F6F] hover:text-[#000000] transition-colors duration-200">
+                Journal
+            </a>
+            <a href="#reach" onclick="switchView('landing')" class="text-sm font-medium text-[#6F6F6F] hover:text-[#000000] transition-colors duration-200">
+                Reach Us
+            </a>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <div id="auth-status-container" class="hidden flex items-center space-x-3">
+                <!-- Swapped in via Javascript when Google connects -->
+            </div>
+            <button onclick="switchView('sanctuary')" id="primary-cta-btn" class="group relative inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-medium bg-[#000000] text-[#FFFFFF] transition-all duration-300 hover:scale-[1.03] active:scale-95 shadow-xs">
+                <span>Begin Journey</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main class="w-full flex-grow">
+        
+        <!-- LANDING VIEW -->
+        <div id="landing-view" class="relative w-full flex flex-col justify-start">
+            
+            <!-- Sound Quick Trigger -->
+            <div class="absolute top-8 right-8 z-30 flex items-center space-x-2">
+                <button onclick="toggleSynthesizer()" class="flex items-center space-x-2 px-3 py-2 bg-white/80 backdrop-blur-md rounded-full border border-neutral-100 text-[#6F6F6F] hover:text-[#000000] transition-colors text-xs font-medium shadow-2xs">
+                    <span id="ambient-icon"><i data-lucide="volume-x" class="w-3.5 h-3.5"></i></span>
+                    <span id="ambient-text">Enable Soundscape</span>
+                </button>
+            </div>
+
+            <!-- Cinematic Video Background Container -->
+            <div id="video-container" class="absolute z-0 overflow-hidden pointer-events-none transition-opacity duration-500" style="top: 300px; inset: auto 0 0 0; height: calc(100vh - 300px); opacity: 0;">
+                <video id="hero-video" class="w-full h-full object-cover" muted playsinline>
+                    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_083109_283f3553-e28f-428b-a723-d639c617eb2b.mp4" type="video/mp4">
+                </video>
+            </div>
+
+            <!-- Soft Edge Fade Gradation Overlay on Video -->
+            <div class="absolute z-10 pointer-events-none" style="top: 250px; inset: auto 0 0 0; height: calc(100vh - 250px); background: linear-gradient(to bottom, #FFFFFF 0%, rgba(255,255,255,0) 25%, rgba(255,255,255,0) 75%, #FFFFFF 100%);"></div>
+
+            <!-- Core Hero Copy Area -->
+            <div class="relative z-20 w-full max-w-7xl mx-auto px-6 text-center flex flex-col items-center justify-start pointer-events-auto" style="padding-top: calc(8rem - 75px); padding-bottom: 10rem;">
+                <div class="animate-fade-rise text-xs uppercase tracking-[0.25em] text-[#6F6F6F] font-bold mb-6">
+                    Aethera Focus Paradigm
+                </div>
+
+                <h1 class="animate-fade-rise font-normal font-serif text-[#000000] text-5xl sm:text-7xl md:text-8xl max-w-7xl tracking-[-2.46px] select-none leading-[0.95]">
+                    Beyond <span class="italic text-[#6F6F6F]">silence,</span> we build <span class="italic text-[#6F6F6F]">the eternal.</span>
+                </h1>
+
+                <p class="animate-fade-rise-delay text-[#6F6F6F] text-base sm:text-lg max-w-2xl mt-8 font-light leading-relaxed">
+                    Building platforms for brilliant minds, fearless makers, and thoughtful souls. Through the noise, we craft digital havens for deep work and pure flows.
+                </p>
+
+                <div class="animate-fade-rise-delay-2 flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
+                    <button onclick="switchView('sanctuary')" class="group relative rounded-full px-14 py-5 text-base font-semibold bg-[#000000] text-[#FFFFFF] shadow-lg hover:scale-[1.03] transition-all duration-300 active:scale-95 inline-flex items-center justify-center space-x-2">
+                        <span>Begin Journey</span>
+                        <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                    
+                    <a href="#about" class="px-8 py-5 text-sm font-semibold text-[#6F6F6F] hover:text-[#000000] transition-colors">
+                        Read Manifesto
+                    </a>
+                </div>
+
+                <!-- Instant Stat Counters -->
+                <div class="animate-fade-rise-delay-2 mt-20 w-full max-w-4xl grid grid-cols-3 gap-4 border-t border-b border-neutral-100 py-6">
+                    <div>
+                        <span id="landing-stat-total" class="block font-serif text-3xl text-neutral-900">140m</span>
+                        <span class="text-xs text-neutral-500 uppercase tracking-widest">Deep Work Logged</span>
+                    </div>
+                    <div class="border-l border-r border-neutral-100">
+                        <span id="landing-stat-streak" class="block font-serif text-3xl text-neutral-900">5 Days</span>
+                        <span class="text-xs text-neutral-500 uppercase tracking-widest">Active Streak</span>
+                    </div>
+                    <div>
+                        <span id="landing-stat-goals" class="block font-serif text-3xl text-neutral-900">1 / 4</span>
+                        <span class="text-xs text-neutral-500 uppercase tracking-widest">Daily Alignment</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About & Manifesto Context Segment -->
+            <div id="about" class="relative z-20 w-full bg-white border-t border-neutral-100 pt-24 pb-32">
+                <div class="max-w-5xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+                    <div>
+                        <h3 class="font-serif text-4xl sm:text-5xl text-[#000000] leading-tight max-w-sm">
+                            A sanctuary for your conscious mind.
+                        </h3>
+                        <p class="mt-6 text-[#6F6F6F] leading-relaxed font-light">
+                            Aethera was built out of necessity. The modern workspace is full of continuous disruption. By bringing together minimalist focus loops, seamless calendar timeline planning, and mindful distraction rescue modules, we help you master deep concentration.
+                        </p>
+                        <div class="mt-8 flex items-center space-x-3">
+                            <span class="text-xs font-semibold text-[#000000] tracking-wider uppercase">Endorsed by Makers</span>
+                            <div class="flex -space-x-2">
+                                <img class="w-7 h-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt="Avatar">
+                                <img class="w-7 h-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" alt="Avatar">
+                                <img class="w-7 h-7 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100" alt="Avatar">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="p-6 bg-neutral-50 rounded-2xl border border-neutral-100">
+                            <h4 class="font-semibold text-sm text-[#000000] flex items-center">
+                                <i data-lucide="clock" class="w-4 h-4 mr-2 text-neutral-700"></i>
+                                Deep Work Timers
+                            </h4>
+                            <p class="mt-2 text-xs text-[#6F6F6F] leading-relaxed">
+                                Set persistent focus states based on custom flow lengths. Tracks actual continuous performance metrics.
+                            </p>
+                        </div>
+                        
+                        <div class="p-6 bg-neutral-50 rounded-2xl border border-neutral-100">
+                            <h4 class="font-semibold text-sm text-[#000000] flex items-center">
+                                <i data-lucide="calendar-days" class="w-4 h-4 mr-2 text-neutral-700"></i>
+                                Google Calendar Bridge
+                            </h4>
+                            <p class="mt-2 text-xs text-[#6F6F6F] leading-relaxed">
+                                Push slots straight to your primary timeline. Live reminders guide you safely back to focus.
+                            </p>
+                        </div>
+
+                        <div class="p-6 bg-neutral-50 rounded-2xl border border-neutral-100">
+                            <h4 class="font-semibold text-sm text-[#000000] flex items-center">
+                                <i data-lucide="shield-alert" class="w-4 h-4 mr-2 text-neutral-700"></i>
+                                5-Minute Resiliency Engine
+                            </h4>
+                            <p class="mt-2 text-xs text-[#6F6F6F] leading-relaxed">
+                                A physical/mental rescue system. High-performance bio-mimetic breathing visualizer blocks distraction triggers.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SANCTUARY MODE (ACTIVE PLATFORM WORKSPACE) -->
+        <div id="sanctuary-view" class="hidden w-full max-w-7xl mx-auto px-4 md:px-8 py-4 pb-24">
+            
+            <!-- Global Dashboard Welcome Header -->
+            <div class="w-full glass-panel rounded-3xl p-6 md:p-8 mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                <div>
+                    <div class="flex items-center space-x-2 text-xs text-[#6F6F6F] font-bold tracking-wider uppercase mb-1">
+                        <span>Sanctuary Mode Engaged</span>
+                        <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+                    </div>
+                    <h2 class="font-serif text-3xl text-neutral-900">
+                        Welcome back to your center, <span id="sanctuary-user-name">Marcus</span>
+                    </h2>
+                    <p class="text-xs text-[#6F6F6F] mt-1">
+                        Ambient dynamic synthesizer and goal-persistence dashboard are primed for creative flow.
+                    </p>
+                </div>
+
+                <!-- Custom Soundscape Generator Tool -->
+                <div class="flex items-center space-x-6 bg-white/90 p-4 rounded-2xl border border-neutral-100 shadow-xs w-full lg:w-auto">
+                    <div>
+                        <div class="text-xs font-semibold text-[#000000] flex items-center mb-1">
+                          <i data-lucide="compass" class="w-3.5 h-3.5 mr-1 text-black"></i>
+                          Calming Synthesizer
+                        </div>
+                        <div class="text-[10px] text-neutral-500">Procedural slow-wave drone generator</div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 flex-1 lg:flex-none">
+                        <input type="range" id="synth-volume" min="0.1" max="1" step="0.05" value="0.4" oninput="adjustVolume(this.value)" class="w-24 accent-black">
+                        <button onclick="toggleSynthesizer()" id="control-synth-btn" class="p-2.5 rounded-full bg-neutral-100 text-neutral-600 hover:bg-neutral-200 transition-all">
+                            <i data-lucide="volume-x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Core Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Left Column (Focus Tools: Timer & Rescue Breathing) -->
+                <div class="lg:col-span-5 space-y-8">
+                    
+                    <!-- Deep Work Engine Timer panel -->
+                    <div class="glass-panel rounded-3xl p-8 relative overflow-hidden flex flex-col items-center justify-center text-center">
+                        <div class="flex items-center space-x-1.5 bg-neutral-100 p-1 rounded-full mb-8 relative z-10">
+                            <button onclick="setTimerMode('focus')" id="timer-mode-focus" class="px-4 py-1.5 rounded-full text-xs font-semibold transition-all bg-white text-black shadow-xs">
+                                Deep Focus (25m)
+                            </button>
+                            <button onclick="setTimerMode('break')" id="timer-mode-break" class="px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-neutral-500 hover:text-black">
+                                Deep Rest (5m)
+                            </button>
+                        </div>
+
+                        <!-- Timer Dial Graphic -->
+                        <div class="relative w-64 h-64 flex items-center justify-center rounded-full bg-white border border-neutral-100 shadow-xs mb-8">
+                            <div id="timer-ring-dash" class="absolute inset-4 rounded-full border border-dashed border-neutral-200" style="animation-duration: 60s;"></div>
+                            
+                            <div class="relative z-10">
+                                <span id="timer-mode-label" class="block text-xs uppercase tracking-widest text-[#6F6F6F] font-semibold mb-1">
+                                    Deep Work Session
+                                </span>
+                                <span id="timer-display" class="font-serif text-6xl text-neutral-900 font-normal">
+                                    25:00
+                                </span>
+                                <span id="timer-status-sub" class="block text-[10px] text-neutral-400 mt-2 uppercase tracking-wider">
+                                    Idle State
+                                </span>
+                            </div>
+
+                            <svg class="absolute inset-0 w-full h-full transform -rotate-90">
+                                <circle cx="128" cy="128" r="120" fill="transparent" stroke="#f3f4f6" stroke-width="3"></circle>
+                                <circle id="timer-progress-svg" cx="128" cy="128" r="120" fill="transparent" stroke="#000000" stroke-width="3" stroke-dasharray="753.98" stroke-dashoffset="0" class="transition-all duration-1000"></circle>
+                            </svg>
+                        </div>
+
+                        <!-- Timer Interactions -->
+                        <div class="flex items-center space-x-4">
+                            <button onclick="resetTimer()" class="p-3 bg-neutral-100 text-neutral-600 rounded-full hover:bg-neutral-200 transition-colors" title="Reset timer">
+                                <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                            </button>
+                            
+                            <button onclick="toggleTimer()" id="play-timer-btn" class="flex items-center space-x-2 px-10 py-4 bg-[#000000] text-white rounded-full font-semibold hover:scale-103 active:scale-95 transition-all shadow-md">
+                                <i data-lucide="play" class="w-5 h-5 fill-white"></i>
+                                <span id="timer-action-text">Commence Flow</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Distraction Rescue Engine -->
+                    <div class="glass-panel rounded-3xl p-8 relative overflow-hidden border border-amber-100 bg-gradient-to-br from-amber-50/20 via-transparent to-transparent">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <span class="px-2.5 py-1 bg-amber-50 border border-amber-100 rounded-full text-[10px] font-bold text-amber-800 tracking-wider uppercase inline-block mb-2">
+                                    Rescue Protocol
+                                </span>
+                                <h3 class="font-serif text-2xl text-neutral-900">Distraction Rescue (5-Min Step Back)</h3>
+                                <p class="text-xs text-[#6F6F6F] mt-1">
+                                    Feeling distracted? Trigger a bio-mimetic respiratory anchor to re-align instantly.
+                                </p>
+                            </div>
+                            <i data-lucide="shield-alert" class="text-amber-600 w-5 h-5"></i>
+                        </div>
+
+                        <!-- Interactive breathing panel toggles dynamically in vanilla JS -->
+                        <div id="rescue-untriggered" class="bg-white/60 p-5 rounded-2xl border border-neutral-100 text-center">
+                            <p class="text-xs text-neutral-500 leading-relaxed mb-4">
+                                Using visual breathwork and gentle audio loops, we reset your neurological focus loop over 5 short minutes.
+                            </p>
+                            <button onclick="startRescueProtocol()" class="w-full py-3 bg-amber-900 hover:bg-amber-950 text-white font-semibold text-xs rounded-full shadow-xs hover:scale-102 transition-all inline-flex items-center justify-center space-x-1">
+                                <span>Activate Step Back</span>
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+
+                        <div id="rescue-triggered" class="hidden flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-neutral-100">
+                            <div id="breathing-visual-orb" class="w-32 h-32 rounded-full bg-gradient-to-br from-amber-200 to-orange-100 shadow-lg flex items-center justify-center text-center p-4 breathing-orb mb-6 transform scale-100">
+                                <span id="breathing-prompt" class="text-xs font-semibold text-amber-900">Prepare to align</span>
+                            </div>
+
+                            <div class="text-center">
+                                <div id="rescue-clock" class="text-2xl font-serif font-normal text-neutral-800">
+                                    05:00
+                                </div>
+                                <p class="text-[10px] text-neutral-400 mt-1">DO NOT SWITCH TABS • DEEPEN YOUR VENTILATION</p>
+                            </div>
+
+                            <button onclick="cancelRescueProtocol()" class="mt-6 text-xs font-medium text-red-600 hover:underline">
+                                Cancel Protocol
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column (Schedules, Goals, Statistics & Logs) -->
+                <div class="lg:col-span-7 space-y-8">
+                    
+                    <!-- Google Calendar Scheduler Integration component -->
+                    <div class="glass-panel rounded-3xl p-8">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                            <div>
+                                <h3 class="font-serif text-2xl text-neutral-900 flex items-center">
+                                    <i data-lucide="calendar-days" class="w-5 h-5 mr-2 text-neutral-800"></i>
+                                    Chronos Schedule Integrator
+                                </h3>
+                                <p class="text-xs text-[#6F6F6F] mt-1">
+                                    Create focused timeline slots synced to Google Calendar API endpoints.
+                                </p>
+                            </div>
+
+                            <div id="calendar-sync-indicator">
+                                <button onclick="openAuthModal()" class="text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-full border border-blue-100 transition-colors">
+                                    Sign In with Google
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Calendar dynamic events stack -->
+                        <div id="calendar-events-list" class="space-y-3 mb-6">
+                            <!-- Populated dynamically via Javascript -->
+                        </div>
+
+                        <!-- Add Event Form -->
+                        <form onsubmit="handleCalendarSubmit(event)" class="p-4 bg-neutral-50 rounded-2xl border border-neutral-100">
+                            <div class="text-xs font-bold text-[#000000] uppercase tracking-wider mb-3">Add Core Focus Block</div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <input type="text" id="event-title-input" placeholder="Title (e.g. Design Studio)" class="p-2.5 bg-white border border-neutral-200 rounded-xl text-xs focus:outline-hidden focus:border-black col-span-1 sm:col-span-3 font-semibold" required>
+
+                                <div>
+                                    <label class="block text-[10px] text-neutral-400 mb-1">Start Time</label>
+                                    <input type="time" id="event-start-input" value="10:00" class="w-full p-2.5 bg-white border border-neutral-200 rounded-xl text-xs focus:outline-hidden">
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] text-neutral-400 mb-1">End Time</label>
+                                    <input type="time" id="event-end-input" value="11:00" class="w-full p-2.5 bg-white border border-neutral-200 rounded-xl text-xs focus:outline-hidden">
+                                </div>
+
+                                <div class="flex items-end">
+                                    <button type="submit" class="w-full py-2.5 bg-black hover:bg-neutral-900 text-white text-xs font-semibold rounded-xl flex items-center justify-center space-x-1">
+                                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                        <span>Schedule Slot</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Alignment Goals & Flow Statistics -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        
+                        <!-- Alignment Goals Component -->
+                        <div class="glass-panel rounded-3xl p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-serif text-xl text-neutral-900 flex items-center">
+                                    <i data-lucide="check-square" class="w-4 h-4 mr-2"></i>
+                                    Alignment Goals
+                                </h3>
+                                <span id="goals-count-badge" class="text-xs text-[#6F6F6F] font-semibold">1/4 Done</span>
+                            </div>
+
+                            <div id="goals-checkbox-stack" class="space-y-3 mb-4 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+                                <!-- Populated dynamically via Javascript -->
+                            </div>
+
+                            <form onsubmit="handleGoalSubmit(event)" class="flex gap-2">
+                                <input type="text" id="goal-title-input" placeholder="Add high-priority action item..." class="flex-1 p-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs focus:outline-hidden focus:border-black font-semibold">
+                                <button type="submit" class="p-2 bg-black text-white rounded-xl hover:scale-105 active:scale-95 transition-all">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Weekly Flow Analytics Panel with custom CSS charts -->
+                        <div class="glass-panel rounded-3xl p-6 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-serif text-xl text-neutral-900 flex items-center mb-2">
+                                    <i data-lucide="bar-chart-3" class="w-4 h-4 mr-2"></i>
+                                    Weekly Flow Sync
+                                </h3>
+                                <div class="text-[10px] text-[#6F6F6F] uppercase tracking-wider mb-4">Minutes logged in quiet state</div>
+                            </div>
+
+                            <!-- Custom Minimal SVG Area & Sparkline Performance Chart -->
+                            <div class="h-32 w-full mt-2 relative">
+                                <div class="absolute inset-0 flex justify-between items-end pb-4 pt-2">
+                                    <!-- Dynamic bars representing the logged focus per day -->
+                                    <div class="flex flex-col items-center justify-end h-full w-8">
+                                        <div id="bar-Mon" class="w-3 bg-neutral-200 rounded-t-sm transition-all duration-500" style="height: 50%;"></div>
+                                        <span class="text-[8px] text-neutral-400 mt-1">Mon</span>
+                                    </div>
+                                    <div class="flex flex-col items-center justify-end h-full w-8">
+                                        <div id="bar-Tue" class="w-3 bg-neutral-200 rounded-t-sm transition-all duration-500" style="height: 66%;"></div>
+                                        <span class="text-[8px] text-neutral-400 mt-1">Tue</span>
+                                    </div>
+                                    <div class="flex flex-col items-center justify-end h-full w-8">
+                                        <div id="bar-Wed" class="w-3 bg-neutral-200 rounded-t-sm transition-all duration-500" style="height: 41%;"></div>
+                                        <span class="text-[8px] text-neutral-400 mt-1">Wed</span>
+                                    </div>
+                                    <div class="flex flex-col items-center justify-end h-full w-8">
+                                        <div id="bar-Thu" class="w-3 bg-neutral-200 rounded-t-sm transition-all duration-500" style="height: 83%;"></div>
+                                        <span class="text-[8px] text-neutral-400 mt-1">Thu</span>
+                                    </div>
+                                    <div class="flex flex-col items-center justify-end h-full w-8">
+                                        <div id="bar-Fri" class="w-3 bg-neutral-200 rounded-t-sm transition-all duration-500" style="height: 61%;"></div>
+                                        <span class="text-[8px] text-neutral-400 mt-1">Fri</span>
+                                    </div>
+                                    <div class="flex flex-col items-center justify-end h-full w-8">
+                                        <div id="bar-Sat" class="w-3 bg-neutral-200 rounded-t-sm transition-all duration-500" style="height: 77%;"></div>
+                                        <span class="text-[8px] text-neutral-400 mt-1">Sat</span>
+                                    </div>
+                                    <div class="flex flex-col items-center justify-end h-full w-8">
+                                        <div id="bar-Sun" class="w-3 bg-black rounded-t-sm transition-all duration-500" style="height: 95%;"></div>
+                                        <span class="text-[8px] text-neutral-800 font-bold mt-1">Sun</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Live Real-Time Logger Feed -->
+                    <div class="glass-panel rounded-3xl p-6">
+                        <div class="flex justify-between items-center mb-4 border-b border-neutral-100 pb-2">
+                            <div class="text-xs font-bold text-[#000000] uppercase tracking-wider flex items-center">
+                                <i data-lucide="bell" class="w-3.5 h-3.5 mr-1.5 text-neutral-700"></i>
+                                Aethera Real-Time Activity Log
+                            </div>
+                            <button onclick="clearActivityLogs()" class="text-[10px] text-[#6F6F6F] hover:underline font-semibold">
+                                Clear Feed
+                            </button>
+                        </div>
+
+                        <div id="activity-log-feed" class="space-y-3 max-h-40 overflow-y-auto custom-scrollbar">
+                            <!-- Injected dynamically via script -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Site Footer Section -->
+    <footer id="reach" class="bg-neutral-50 border-t border-neutral-100 py-16 w-full">
+        <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <span class="font-serif text-2xl text-neutral-900">Aethera®</span>
+            <span class="text-xs text-neutral-400">© 2026 Aethera Studio. Dedicated to the deep workers.</span>
+            <div class="flex space-x-6 text-xs text-[#6F6F6F]">
+                <a href="#about" class="hover:text-black">Manifesto</a>
+                <a href="#" class="hover:text-black">Privacy Protocol</a>
+                <a href="#" class="hover:text-black">Terms of Quiet</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Authentic Google Sign-In Modal -->
+    <div id="google-auth-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Blur Backdrop -->
+        <div class="absolute inset-0 bg-neutral-900/40 backdrop-blur-md" onclick="closeAuthModal()"></div>
+        
+        <!-- Interactive Modal Card -->
+        <div class="relative z-10 w-full max-w-md bg-white rounded-3xl p-8 border border-neutral-100 shadow-2xl">
+            <button onclick="closeAuthModal()" class="absolute top-6 right-6 p-1 text-neutral-400 hover:text-black">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="text-center">
+                <div class="w-12 h-12 bg-neutral-50 border border-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="calendar-days" class="w-6 h-6 text-neutral-800"></i>
+                </div>
+                <h3 class="font-serif text-2xl text-neutral-900">Google Calendar Auth</h3>
+                <p class="text-xs text-[#6F6F6F] mt-2 max-w-xs mx-auto">
+                    Securely bind your Aethera Sanctuary focus logs directly to Google Calendar. We protect your timelines.
+                </p>
+            </div>
+
+            <div class="mt-8 space-y-3">
+                <button onclick="authenticateGoogleUser()" class="w-full py-3.5 bg-[#4285F4] hover:bg-[#357AE8] text-white font-semibold text-xs rounded-full flex items-center justify-center space-x-2 shadow-xs hover:scale-102 transition-all">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                    </svg>
+                    <span>Authorize Google Profile</span>
+                </button>
+                
+                <button onclick="closeAuthModal()" class="w-full py-3.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-semibold text-xs rounded-full transition-all">
+                    Stay Anonymous
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GLOBAL STATE MACHINE ---
+        const state = {
+            view: 'landing',
+            isGoogleConnected: false,
+            googleUser: null,
+            
+            // Focus Timer Mechanics
+            timerMode: 'focus', // 'focus' | 'break'
+            timeLeft: 25 * 60,
+            isTimerRunning: false,
+            timerInterval: null,
+            totalFocusLogged: 140, // in minutes
+            streakCount: 5,
+
+            // Distraction step-back rescue
+            isRescueActive: false,
+            rescueTimeLeft: 300,
+            rescueInterval: null,
+            breathingPhase: 0, // 0: inhale, 1: hold, 2: exhale
+
+            // Web Audio API Synthesizer State
+            audioCtx: null,
+            oscillators: [],
+            mainGain: null,
+            isSoundPlaying: false,
+            soundVolume: 0.4,
+
+            // Goal metrics
+            goals: [
+                { id: 1, text: 'Design hero section video loop logic', completed: true },
+                { id: 2, text: 'Simulate high-fidelity Google Calendar push', completed: false },
+                { id: 3, text: 'Integrate dynamic procedural soundscape module', completed: false },
+                { id: 4, text: 'Complete a 5-minute Distraction Rescue session', completed: false }
+            ],
+
+            // Schedule calendar slots
+            calendarEvents: [
+                { id: 1, title: 'Deep Work: Core Architecture', start: '09:00', end: '11:00', type: 'focus', synced: true },
+                { id: 2, title: 'Studio Review: Aethera Design Systems', start: '13:30', end: '14:30', type: 'review', synced: true },
+                { id: 3, title: 'Mindful Scribing & Journaling', start: '17:00', end: '17:30', type: 'meditation', synced: true }
+            ],
+
+            // Application feed logs
+            notifications: [
+                { id: 1, message: "Welcome to Aethera Sanctuary. Align your timeline.", time: "Just now" }
+            ]
+        };
+
+        // --- ONLOAD SYSTEM INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initVideoSeamlessLoop();
+            renderGoals();
+            renderCalendarEvents();
+            renderNotifications();
+            updateTimerDisplay();
+            updateStatsDisplays();
+        });
+
+        // --- DYNAMIC VIEW SWITCHER ---
+        function switchView(targetView) {
+            state.view = targetView;
+            
+            const landingDiv = document.getElementById('landing-view');
+            const sanctuaryDiv = document.getElementById('sanctuary-view');
+            const primaryCta = document.getElementById('primary-cta-btn');
+            
+            const navHome = document.getElementById('nav-home');
+            const navStudio = document.getElementById('nav-studio');
+
+            if (targetView === 'landing') {
+                landingDiv.classList.remove('hidden');
+                sanctuaryDiv.classList.add('hidden');
+                primaryCta.classList.remove('hidden');
+                
+                navHome.className = "text-sm font-medium text-[#000000] transition-colors duration-200";
+                navStudio.className = "text-sm font-medium text-[#6F6F6F] hover:text-[#000000] transition-colors duration-200";
+            } else {
+                landingDiv.classList.add('hidden');
+                sanctuaryDiv.classList.remove('hidden');
+                primaryCta.classList.add('hidden');
+                
+                navHome.className = "text-sm font-medium text-[#6F6F6F] hover:text-[#000000] transition-colors duration-200";
+                navStudio.className = "text-sm font-medium text-[#000000] transition-colors duration-200";
+            }
+            updateStatsDisplays();
+        }
+
+        // --- STREAMING_CHUNK: Implementing the seamless video loop engine... ---
+        function initVideoSeamlessLoop() {
+            const video = document.getElementById('hero-video');
+            const container = document.getElementById('video-container');
+            if (!video) return;
+
+            // Trigger autoplay smoothly
+            video.play().catch(() => {
+                console.log("Autoplay caught on interaction restrictions. Priming play upon body click.");
+            });
+
+            function checkVideoTimeline() {
+                if (video && video.duration) {
+                    const current = video.currentTime;
+                    const duration = video.duration;
+                    const fadeDuration = 0.5; // 0.5s soft transitions
+
+                    if (current < fadeDuration) {
+                        // Fade In
+                        container.style.opacity = current / fadeDuration;
+                    } else if (current > duration - fadeDuration) {
+                        // Fade Out before end
+                        const ratio = (duration - current) / fadeDuration;
+                        container.style.opacity = Math.max(0, ratio);
+                    } else {
+                        // Fully Visible
+                        container.style.opacity = 1;
+                    }
+                }
+                requestAnimationFrame(checkVideoTimeline);
+            }
+
+            video.addEventListener('ended', () => {
+                container.style.opacity = 0;
+                // Add 100ms fade buffer transition
+                setTimeout(() => {
+                    video.currentTime = 0;
+                    video.play().catch(err => console.log(err));
+                }, 100);
+            });
+
+            requestAnimationFrame(checkVideoTimeline);
+        }
+
+        // --- STREAMING_CHUNK: Programming the procedural sound synthesizer (Web Audio API)... ---
+        function toggleSynthesizer() {
+            if (state.isSoundPlaying) {
+                stopProceduralSynth();
+            } else {
+                startProceduralSynth();
+            }
+        }
+
+        function startProceduralSynth() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+
+                state.audioCtx = new AudioContext();
+                state.mainGain = state.audioCtx.createGain();
+                state.mainGain.gain.setValueAtTime(state.soundVolume * 0.15, state.audioCtx.currentTime);
+                state.mainGain.connect(state.audioCtx.destination);
+
+                // Calming Minor Chord Structures
+                const scaleFreqs = [110.0, 165.0, 220.0, 330.0];
+                scaleFreqs.forEach(freq => {
+                    const osc = state.audioCtx.createOscillator();
+                    const oscGain = state.audioCtx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, state.audioCtx.currentTime);
+                    oscGain.gain.setValueAtTime(0.05, state.audioCtx.currentTime);
+                    
+                    osc.connect(oscGain);
+                    oscGain.connect(state.mainGain);
+                    
+                    osc.start();
+                    state.oscillators.push(osc);
+
+                    // Dynamic slow pitch oscillation to replicate organic wind patterns
+                    const oscInterval = setInterval(() => {
+                        if (state.audioCtx && state.audioCtx.state === 'running') {
+                            const time = state.audioCtx.currentTime;
+                            oscGain.gain.exponentialRampToValueAtTime(
+                                0.02 + Math.random() * 0.08,
+                                time + 3 + Math.random() * 3
+                            );
+                        } else {
+                            clearInterval(oscInterval);
+                        }
+                    }, 5000);
+                });
+
+                state.isSoundPlaying = true;
+                updateSoundControlsUI(true);
+                addNotification("Aethera deep synthesizer active.");
+            } catch(e) {
+                console.warn("Synthesizer launch blocked: ", e);
+            }
+        }
+
+        function stopProceduralSynth() {
+            state.oscillators.forEach(osc => {
+                try { osc.stop(); } catch(e){}
+            });
+            state.oscillators = [];
+            if (state.audioCtx) {
+                state.audioCtx.close();
+            }
+            state.isSoundPlaying = false;
+            updateSoundControlsUI(false);
+            addNotification("Synthesizer muted.");
+        }
+
+        function adjustVolume(val) {
+            state.soundVolume = parseFloat(val);
+            if (state.mainGain && state.audioCtx) {
+                state.mainGain.gain.setValueAtTime(state.soundVolume * 0.15, state.audioCtx.currentTime);
+            }
+        }
+
+        function updateSoundControlsUI(isPlaying) {
+            const landingIcon = document.getElementById('ambient-icon');
+            const landingText = document.getElementById('ambient-text');
+            const controlBtn = document.getElementById('control-synth-btn');
+
+            if (isPlaying) {
+                landingIcon.innerHTML = `<i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-600 animate-pulse"></i>`;
+                landingText.innerText = "Synthesizer Engaged";
+                controlBtn.innerHTML = `<i data-lucide="volume-2" class="w-4 h-4 text-emerald-600"></i>`;
+                controlBtn.className = "p-2.5 rounded-full bg-black text-white hover:scale-105 transition-all";
+            } else {
+                landingIcon.innerHTML = `<i data-lucide="volume-x" class="w-3.5 h-3.5"></i>`;
+                landingText.innerText = "Enable Soundscape";
+                controlBtn.innerHTML = `<i data-lucide="volume-x" class="w-4 h-4"></i>`;
+                controlBtn.className = "p-2.5 rounded-full bg-neutral-100 text-neutral-600 hover:bg-neutral-200 transition-all";
+            }
+            lucide.createIcons();
+        }
+
+        // --- STREAMING_CHUNK: Coding the focus timer countdown & progression logic... ---
+        function setTimerMode(mode) {
+            state.timerMode = mode;
+            state.isTimerRunning = false;
+            clearInterval(state.timerInterval);
+            
+            const btnFocus = document.getElementById('timer-mode-focus');
+            const btnBreak = document.getElementById('timer-mode-break');
+            const modeLabel = document.getElementById('timer-mode-label');
+
+            if (mode === 'focus') {
+                state.timeLeft = 25 * 60;
+                btnFocus.className = "px-4 py-1.5 rounded-full text-xs font-semibold transition-all bg-white text-black shadow-xs";
+                btnBreak.className = "px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-neutral-500 hover:text-black";
+                modeLabel.innerText = "Deep Work Session";
+            } else {
+                state.timeLeft = 5 * 60;
+                btnFocus.className = "px-4 py-1.5 rounded-full text-xs font-semibold transition-all text-neutral-500 hover:text-black";
+                btnBreak.className = "px-4 py-1.5 rounded-full text-xs font-semibold transition-all bg-white text-black shadow-xs";
+                modeLabel.innerText = "Relax Cycle";
+            }
+            
+            updateTimerDisplay();
+            updateTimerButtonUI();
+        }
+
+        function toggleTimer() {
+            if (state.isTimerRunning) {
+                state.isTimerRunning = false;
+                clearInterval(state.timerInterval);
+                document.getElementById('timer-status-sub').innerText = "IDLE STATE";
+            } else {
+                state.isTimerRunning = true;
+                document.getElementById('timer-status-sub').innerText = "FLOW CONSTRAINED";
+                state.timerInterval = setInterval(() => {
+                    if (state.timeLeft > 0) {
+                        state.timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        handleTimerComplete();
+                    }
+                }, 1000);
+            }
+            updateTimerButtonUI();
+        }
+
+        function resetTimer() {
+            state.isTimerRunning = false;
+            clearInterval(state.timerInterval);
+            state.timeLeft = state.timerMode === 'focus' ? 25 * 60 : 5 * 60;
+            document.getElementById('timer-status-sub').innerText = "IDLE STATE";
+            updateTimerDisplay();
+            updateTimerButtonUI();
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(state.timeLeft / 60).toString().padStart(2, '0');
+            const secs = (state.timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${mins}:${secs}`;
+
+            // Update SVG Ring Progress
+            const maxTime = state.timerMode === 'focus' ? 25 * 60 : 5 * 60;
+            const percentage = 1 - (state.timeLeft / maxTime);
+            const ringLength = 753.98; // 2 * PI * 120
+            const offset = ringLength * percentage;
+            document.getElementById('timer-progress-svg').setAttribute('stroke-dashoffset', offset);
+        }
+
+        function updateTimerButtonUI() {
+            const playBtn = document.getElementById('play-timer-btn');
+            const actionText = document.getElementById('timer-action-text');
+            const ringDash = document.getElementById('timer-ring-dash');
+
+            if (state.isTimerRunning) {
+                playBtn.innerHTML = `<i data-lucide="pause" class="w-5 h-5 fill-white"></i><span id="timer-action-text">Hold State</span>`;
+                ringDash.classList.add('animate-spin');
+            } else {
+                playBtn.innerHTML = `<i data-lucide="play" class="w-5 h-5 fill-white"></i><span id="timer-action-text">Commence Flow</span>`;
+                ringDash.classList.remove('animate-spin');
+            }
+            lucide.createIcons();
+        }
+
+        function handleTimerComplete() {
+            clearInterval(state.timerInterval);
+            state.isTimerRunning = false;
+            
+            if (state.timerMode === 'focus') {
+                state.totalFocusLogged += 25;
+                addNotification("Deep Work complete! Logged 25 mins successfully.");
+                setTimerMode('break');
+            } else {
+                addNotification("Step Back completed. Time to re-align.");
+                setTimerMode('focus');
+            }
+            updateStatsDisplays();
+        }
+
+        // --- STREAMING_CHUNK: Programming the visual breathing distraction rescue loop... ---
+        function startRescueProtocol() {
+            state.isRescueActive = true;
+            state.rescueTimeLeft = 300;
+            state.breathingPhase = 0;
+
+            document.getElementById('rescue-untriggered').classList.add('hidden');
+            document.getElementById('rescue-triggered').classList.remove('hidden');
+
+            addNotification("Distraction step back active. Deepen focus.");
+            triggerBreathingVisual();
+
+            state.rescueInterval = setInterval(() => {
+                if (state.rescueTimeLeft > 0) {
+                    state.rescueTimeLeft--;
+                    
+                    // Format rescue clock
+                    const mins = Math.floor(state.rescueTimeLeft / 60).toString().padStart(2, '0');
+                    const secs = (state.rescueTimeLeft % 60).toString().padStart(2, '0');
+                    document.getElementById('rescue-clock').innerText = `${mins}:${secs}`;
+                } else {
+                    completeRescueProtocol();
+                }
+            }, 1000);
+        }
+
+        function triggerBreathingVisual() {
+            if (!state.isRescueActive) return;
+
+            const orb = document.getElementById('breathing-visual-orb');
+            const prompt = document.getElementById('breathing-prompt');
+
+            // 12-second total physiological breathing sync sequence
+            if (state.breathingPhase === 0) {
+                prompt.innerText = "Inhale deeply...";
+                orb.style.transform = "scale(1.3)";
+                state.breathingPhase = 1;
+                setTimeout(triggerBreathingVisual, 4000);
+            } else if (state.breathingPhase === 1) {
+                prompt.innerText = "Hold...";
+                orb.style.transform = "scale(1.15)";
+                state.breathingPhase = 2;
+                setTimeout(triggerBreathingVisual, 4000);
+            } else {
+                prompt.innerText = "Exhale fully...";
+                orb.style.transform = "scale(0.85)";
+                state.breathingPhase = 0;
+                setTimeout(triggerBreathingVisual, 4000);
+            }
+        }
+
+        function cancelRescueProtocol() {
+            clearInterval(state.rescueInterval);
+            state.isRescueActive = false;
+            document.getElementById('rescue-untriggered').classList.remove('hidden');
+            document.getElementById('rescue-triggered').classList.add('hidden');
+            addNotification("Rescue protocol terminated.");
+        }
+
+        function completeRescueProtocol() {
+            clearInterval(state.rescueInterval);
+            state.isRescueActive = false;
+            document.getElementById('rescue-untriggered').classList.remove('hidden');
+            document.getElementById('rescue-triggered').classList.add('hidden');
+            addNotification("Sovereign mental flow re-established.");
+        }
+
+        // --- STREAMING_CHUNK: Simulating Google Calendar OAuth authentication flows... ---
+        function openAuthModal() {
+            document.getElementById('google-auth-modal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('google-auth-modal').classList.add('hidden');
+        }
+
+        function authenticateGoogleUser() {
+            state.isGoogleConnected = true;
+            state.googleUser = {
+                name: "Marcus Aurelius",
+                email: "marcus@aethera.studio"
+            };
+
+            addNotification("Synced timeline seamlessly with Google Calendar.");
+            closeAuthModal();
+
+            // Auto-update indicators and timeline records to show Google connection
+            state.calendarEvents.forEach(e => e.synced = true);
+            renderCalendarEvents();
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            const authIndicator = document.getElementById('calendar-sync-indicator');
+            const topNavAuth = document.getElementById('auth-status-container');
+            const userNameSpan = document.getElementById('sanctuary-user-name');
+
+            if (state.isGoogleConnected) {
+                authIndicator.innerHTML = `
+                    <div class="flex items-center space-x-2 bg-emerald-50 text-emerald-800 text-xs px-3 py-1 rounded-full border border-emerald-100 font-semibold">
+                        <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                        <span>Google Linked</span>
+                    </div>
+                `;
+
+                topNavAuth.className = "flex items-center space-x-2 bg-neutral-50 px-3 py-1.5 rounded-full border border-neutral-100";
+                topNavAuth.innerHTML = `
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <span class="text-xs text-[#6F6F6F] font-medium max-w-[100px] truncate">${state.googleUser.name}</span>
+                `;
+
+                userNameSpan.innerText = state.googleUser.name;
+            }
+            lucide.createIcons();
+        }
+
+        // --- STREAMING_CHUNK: Managing scheduling lists and timelines dynamically... ---
+        function renderCalendarEvents() {
+            const list = document.getElementById('calendar-events-list');
+            list.innerHTML = '';
+
+            state.calendarEvents.forEach(event => {
+                let badgeColor = 'bg-emerald-50 text-emerald-700';
+                if (event.type === 'focus') badgeColor = 'bg-indigo-50 text-indigo-700';
+                if (event.type === 'review') badgeColor = 'bg-amber-50 text-amber-700';
+
+                const eventCard = document.createElement('div');
+                eventCard.className = "p-4 bg-white hover:bg-neutral-50 rounded-2xl border border-neutral-100 flex justify-between items-center transition-all shadow-2xs animate-fade-rise";
+                eventCard.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 rounded-xl ${badgeColor}">
+                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm font-semibold text-[#000000]">${event.title}</div>
+                            <div class="text-xs text-neutral-400 mt-0.5">${event.start} - ${event.end}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        ${event.synced ? `<span class="text-[10px] bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-full">Google Synced</span>` : ''}
+                        <button onclick="deleteEvent(${event.id})" class="text-neutral-300 hover:text-red-500 p-1">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(eventCard);
+            });
+            lucide.createIcons();
+        }
+
+        function handleCalendarSubmit(e) {
+            e.preventDefault();
+            const titleInput = document.getElementById('event-title-input');
+            const startInput = document.getElementById('event-start-input');
+            const endInput = document.getElementById('event-end-input');
+
+            if (!titleInput.value.trim()) return;
+
+            const newEvent = {
+                id: Date.now(),
+                title: titleInput.value,
+                start: startInput.value,
+                end: endInput.value,
+                type: 'custom',
+                synced: state.isGoogleConnected
+            };
+
+            state.calendarEvents.push(newEvent);
+            state.calendarEvents.sort((a,b) => a.start.localeCompare(b.start));
+            
+            titleInput.value = '';
+            renderCalendarEvents();
+            addNotification(`Scheduled and synched slot: "${newEvent.title}"`);
+        }
+
+        function deleteEvent(id) {
+            state.calendarEvents = state.calendarEvents.filter(e => e.id !== id);
+            renderCalendarEvents();
+        }
+
+        // --- STREAMING_CHUNK: Managing goal states and daily progress analytics... ---
+        function renderGoals() {
+            const stack = document.getElementById('goals-checkbox-stack');
+            stack.innerHTML = '';
+
+            state.goals.forEach(goal => {
+                const item = document.createElement('div');
+                item.className = `flex items-start space-x-3 p-3 bg-white rounded-xl border border-neutral-100 cursor-pointer hover:bg-neutral-50 transition-all ${goal.completed ? 'opacity-60' : ''}`;
+                item.onclick = () => toggleGoal(goal.id);
+                item.innerHTML = `
+                    <input type="checkbox" ${goal.completed ? 'checked' : ''} class="mt-1 accent-black" onclick="event.stopPropagation(); toggleGoal(${goal.id});">
+                    <span class="text-xs text-neutral-800 leading-tight ${goal.completed ? 'line-through' : ''}">
+                        ${goal.text}
+                    </span>
+                `;
+                stack.appendChild(item);
+            });
+
+            // Sync completion count
+            const completedCount = state.goals.filter(g => g.completed).length;
+            document.getElementById('goals-count-badge').innerText = `${completedCount}/${state.goals.length} Done`;
+            updateStatsDisplays();
+        }
+
+        function toggleGoal(id) {
+            state.goals = state.goals.map(g => {
+                if (g.id === id) {
+                    const status = !g.completed;
+                    if (status) {
+                        addNotification(`Goal achieved: "${g.text}"`);
+                        state.streakCount++;
+                    }
+                    return { ...g, completed: status };
+                }
+                return g;
+            });
+            renderGoals();
+        }
+
+        function handleGoalSubmit(e) {
+            e.preventDefault();
+            const goalInput = document.getElementById('goal-title-input');
+            if (!goalInput.value.trim()) return;
+
+            state.goals.push({
+                id: Date.now(),
+                text: goalInput.value,
+                completed: false
+            });
+
+            goalInput.value = '';
+            renderGoals();
+        }
+
+        // --- STREAMING_CHUNK: Structuring activity notifications logging... ---
+        function addNotification(message) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            state.notifications.unshift({
+                id: Date.now(),
+                message: message,
+                time: timeStr
+            });
+
+            renderNotifications();
+        }
+
+        function renderNotifications() {
+            const container = document.getElementById('activity-log-feed');
+            container.innerHTML = '';
+
+            if (state.notifications.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-xs text-neutral-400">Activity is quiet and aligned.</div>`;
+                return;
+            }
+
+            state.notifications.forEach(log => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-start text-xs border-b border-dashed border-neutral-50 pb-2 last:border-0 last:pb-0";
+                div.innerHTML = `
+                    <span class="text-[#6F6F6F] leading-tight pr-4">${log.message}</span>
+                    <span class="text-[10px] text-neutral-400 whitespace-nowrap">${log.time}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function clearActivityLogs() {
+            state.notifications = [];
+            renderNotifications();
+        }
+
+        function updateStatsDisplays() {
+            // Logged metric counts
+            document.getElementById('landing-stat-total').innerText = `${state.totalFocusLogged}m`;
+            document.getElementById('landing-stat-streak').innerText = `${state.streakCount} Days`;
+            
+            const doneCount = state.goals.filter(g => g.completed).length;
+            document.getElementById('landing-stat-goals').innerText = `${doneCount} / ${state.goals.length}`;
+
+            // Sync visual representation charts
+            const todayHeightPercentage = Math.min(100, (state.totalFocusLogged / 200) * 100);
+            const sunBar = document.getElementById('bar-Sun');
+            if (sunBar) {
+                sunBar.style.height = `${todayHeightPercentage}%`;
+            }
+        }
+    </script>
+</body>
+</html>
